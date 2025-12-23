@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual env
+.venv/
+venv/
+ENV/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Project runtime data (do not commit)
+uploads/
+_test_temp_keep/
+.claude/
+
+# Only commit code (ignore all runtime/data/artifacts)
+# Data / caches / saves
+data/
+players.json
+weapons.json
+*.json
+
+# Datasets / demos
+*.mp3
+*.wav
+*.flac
+demo/
+
+# Training artifacts / models / results
+models/
+results/
+*.pth
+*.pkl
+*.txt
+!requirements.txt
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.csv
+*.xlsx
+
+# Reports / office docs / archives
+*.pdf
+*.doc
+*.docx
+*.7z
+
+# Reports / docs markdown (keep only README)
+*.md
+!README.md
+
+# Common local scratch
+*.log
+*.tmp

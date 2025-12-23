@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}音频识别 - PUBG武器管理系统{% endblock %}
+
+{% block content %}
+<div class="audio-recognition-page">
+    <h2>🎵 武器声音识别</h2>
+    <p class="subtitle">{{ model_info }}</p>
+    {% if model_status %}
+        {% if model_loaded %}
+        <div class="notice notice-success">{{ model_status }}</div>
+        {% else %}
+        <div class="notice notice-warn">{{ model_status }}</div>
+        {% endif %}
+    {% endif %}
+
+    <!-- 上传区域 -->
+    <div class="upload-section">
+        <div class="upload-box" id="uploadBox">
+            <div class="upload-icon">📁</div>
+            <h3>上传音频文件</h3>
+            <p>支持 MP3, WAV, FLAC 格式</p>
+            <input type="file" id="audioFile" accept=".mp3,.wav,.flac" style="display: none;">
+            <button onclick="document.getElementById('audioFile').click()" class="btn btn-primary">
+                选择文件
+            </button>
+        </div>
+
+        <div id="selectedFile" class="selected-file" style="display: none;">
+            <div class="file-info">
+                <span class="file-icon">🎵</span>
+                <span id="fileName"></span>
+            </div>
+            <button onclick="uploadAudio()" class="btn btn-success" id="recognizeBtn">
+                🤖 开始识别
+            </button>
+        </div>
+    </div>
+
+    <!-- 识别结果 -->
+    <div id="resultSection" class="result-section" style="display: none;">
+        <h3>识别结果</h3>
+        <div id="resultCard" class="result-card">
+            <!-- 结果将在这里显示 -->
+        </div>
+    </div>
+
+    <!-- 演示音频 -->
+    <div class="demo-section">
+        <h3>🎯 演示音频</h3>
+        <p>可以使用以下演示音频进行测试:</p>
+        <div class="demo-grid">
+            <div class="demo-item">
+                <span>🔫 AKM</span>
+                <code>demo/ak_demo.mp3</code>
+            </div>
+            <div class="demo-item">
+                <span>🔫 M416</span>
+                <code>demo/m4_demo.mp3</code>
+            </div>
+            <div class="demo-item">
+                <span>🔫 AWM</span>
+                <code>demo/awm_demo.mp3</code>
+            </div>
+            <div class="demo-item">
+                <span>🔫 SKS</span>
+                <code>demo/sks_demo.mp3</code>
+            </div>
+            <div class="demo-item">
+                <span>🔫 UMP9</span>
+                <code>demo/ump_demo.mp3</code>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const MODEL_LOADED = {{ 'true' if model_loaded else 'false' }};
+
+// 文件选择
+document.getElementById('audioFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('selectedFile').style.display = 'flex';
+        document.getElementById('resultSection').style.display = 'none';
+    }
+});
+
+// 上传识别
+function uploadAudio() {
+    if (!MODEL_LOADED) {
+        showResult('error', '音频识别模型未就绪，无法识别。');
+        return;
+    }
+
+    const fileInput = document.getElementById('audioFile');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('请先选择文件');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('audio_file', file);
+
+    const recognizeBtn = document.getElementById('recognizeBtn');
+    recognizeBtn.disabled = true;
+    recognizeBtn.textContent = '🔄 识别中...';
+
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+    fetch('/upload_audio', {
+        method: 'POST',
+        headers: csrfToken ? { 'X-CSRFToken': csrfToken } : {},
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showResult('error', data.error);
+        } else {
+            showResult('success', data.weapon, data.confidence);
+        }
+    })
+    .catch(error => {
+        showResult('error', '识别失败: ' + error);
+    })
+    .finally(() => {
+        recognizeBtn.disabled = false;
+        recognizeBtn.textContent = '🤖 开始识别';
+    });
+}
+
+// 显示结果
+function showResult(type, weapon, confidence) {
+    const resultSection = document.getElementById('resultSection');
+    const resultCard = document.getElementById('resultCard');
+
+    resultSection.style.display = 'block';
+
+    if (type === 'success') {
+        resultCard.innerHTML = `
+            <div class="result-success">
+                <div class="result-icon">✅</div>
+                <h2>${weapon}</h2>
+                <p class="confidence">置信度: ${confidence}</p>
+            </div>
+        `;
+    } else {
+        resultCard.innerHTML = `
+            <div class="result-error">
+                <div class="result-icon">❌</div>
+                <h3>识别失败</h3>
+                <p>${weapon}</p>
+            </div>
+        `;
+    }
+
+    // 滚动到结果
+    resultSection.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}

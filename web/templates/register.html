@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}注册 - PUBG武器管理系统{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h2>📝 用户注册</h2>
+        <p class="subtitle">创建你的账号</p>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="username">学号</label>
+                <input type="text" id="username" name="username" required autofocus minlength="6">
+                <small>至少6位</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required minlength="6">
+                <small>至少6个字符</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">确认密码</label>
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn btn-primary">注册</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>已有账号? <a href="{{ url_for('login') }}">立即登录</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

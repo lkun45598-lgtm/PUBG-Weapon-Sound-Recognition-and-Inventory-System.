@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - PUBG武器管理系统{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h2>🔐 用户登录</h2>
+        <p class="subtitle">欢迎来到PUBG武器管理系统</p>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="username">学号</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">登录</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>还没有账号? <a href="{{ url_for('register') }}">立即注册</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

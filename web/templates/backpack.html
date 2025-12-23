@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}我的背包 - PUBG武器管理系统{% endblock %}
+
+{% block content %}
+<div class="backpack-page">
+    <h2>🎒 我的背包</h2>
+
+    {% if weapons %}
+    <p class="subtitle">你有 {{ weapons|length }} 件武器</p>
+
+    <div class="weapon-list">
+        {% for weapon in weapons %}
+        <div class="weapon-item">
+            <div class="weapon-info">
+                <h3>{{ weapon.name }}</h3>
+                <span class="weapon-type-badge">{{ weapon.weapon_type }}</span>
+            </div>
+
+            <div class="weapon-stats-inline">
+                <span>💥 {{ weapon.damage }}</span>
+                <span>🔥 {{ weapon.fire_rate }}</span>
+                <span>📦 {{ weapon.magazine_size }}</span>
+                <span>🎯 {{ weapon.effective_range }}m</span>
+                <span class="dps">📊 DPS: {{ "%.1f"|format(weapon.calculate_dps()) }}</span>
+            </div>
+
+            <form method="POST" action="{{ url_for('remove_weapon', weapon_name=weapon.name) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('确定要移除 {{ weapon.name }} 吗?')">
+                    🗑️ 移除
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🎒</div>
+        <h3>背包是空的</h3>
+        <p>去武器库添加一些武器吧!</p>
+        <a href="{{ url_for('weapons') }}" class="btn btn-primary">前往武器库</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

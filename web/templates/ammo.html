@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}弹药管理 - PUBG武器管理系统{% endblock %}
+
+{% block content %}
+<div class="ammo-page">
+    <h2>🔫 弹药管理</h2>
+
+    <!-- 弹药库存 -->
+    <div class="section">
+        <h3>📦 弹药库存</h3>
+
+        {% if ammo_inventory %}
+        <div class="ammo-grid">
+            {% for ammo_type, amount in ammo_inventory.items() %}
+            <div class="ammo-card">
+                <div class="ammo-icon">📦</div>
+                <h4>{{ ammo_type }}</h4>
+                <div class="ammo-amount">
+                    <span class="current">{{ amount }}</span>
+                    <span class="total">/ {{ total_ammo.get(ammo_type, amount) }}</span>
+                </div>
+                <small>库存 / 总计</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-message">暂无弹药库存</p>
+        {% endif %}
+    </div>
+
+    <!-- 添加弹药 -->
+    <div class="section">
+        <h3>➕ 添加弹药</h3>
+        <form method="POST" action="{{ url_for('add_ammo') }}" class="ammo-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="ammo_type">弹药类型:</label>
+                <select name="ammo_type" id="ammo_type" required>
+                    <option value="5.56mm">5.56mm</option>
+                    <option value="7.62mm">7.62mm</option>
+                    <option value="9mm">9mm</option>
+                    <option value=".45ACP">.45ACP</option>
+                    <option value="12gauge">12gauge</option>
+                    <option value=".300Magnum">.300Magnum</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="amount">数量:</label>
+                <input type="number" name="amount" id="amount" min="1" value="30" required>
+            </div>
+            <button type="submit" class="btn btn-success">添加弹药</button>
+        </form>
+    </div>
+
+    <!-- 武器换弹 -->
+    {% if weapons %}
+    <div class="section">
+        <h3>🔄 武器换弹</h3>
+        <div class="weapon-reload-list">
+            {% for weapon in weapons %}
+            <div class="weapon-reload-item">
+                <div class="weapon-reload-info">
+                    <h4>{{ weapon.name }}</h4>
+                    <div class="ammo-status">
+                        <span class="ammo-type-badge">{{ weapon.ammo_type }}</span>
+                        <span class="ammo-count">{{ weapon.current_ammo }} / {{ weapon.magazine_size }}</span>
+                    </div>
+                </div>
+                <form method="POST" action="{{ url_for('reload_weapon_route', weapon_name=weapon.name) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary btn-small">🔄 换弹</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="section">
+        <h3>🔄 武器换弹</h3>
+        <div class="empty-state">
+            <div class="empty-icon">🎒</div>
+            <h3>背包里没有武器</h3>
+            <p>去武器库添加一些武器吧!</p>
+            <a href="{{ url_for('weapons') }}" class="btn btn-primary">前往武器库</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

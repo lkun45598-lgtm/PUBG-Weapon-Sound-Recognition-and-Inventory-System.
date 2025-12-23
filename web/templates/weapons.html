@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}武器库 - PUBG武器管理系统{% endblock %}
+
+{% block content %}
+<div class="weapons-page">
+    <h2>🔫 武器库</h2>
+
+    <!-- 搜索和排序 -->
+    <div class="toolbar">
+        <form method="GET" action="{{ url_for('weapons') }}" class="search-form">
+            <input type="text" name="search" placeholder="搜索武器..." value="{{ search }}">
+            <button type="submit" class="btn btn-secondary">🔍 搜索</button>
+        </form>
+
+        <div class="sort-buttons">
+            <span>排序:</span>
+            <a href="{{ url_for('weapons', sort_by='name') }}" class="btn btn-small {% if sort_by == 'name' %}active{% endif %}">名称</a>
+            <a href="{{ url_for('weapons', sort_by='damage') }}" class="btn btn-small {% if sort_by == 'damage' %}active{% endif %}">伤害</a>
+            <a href="{{ url_for('weapons', sort_by='fire_rate') }}" class="btn btn-small {% if sort_by == 'fire_rate' %}active{% endif %}">射速</a>
+            <a href="{{ url_for('weapons', sort_by='dps') }}" class="btn btn-small {% if sort_by == 'dps' %}active{% endif %}">DPS</a>
+        </div>
+    </div>
+
+    <!-- 武器列表 -->
+    {% if weapons %}
+    <div class="weapon-grid">
+        {% for weapon in weapons %}
+        <div class="weapon-card detailed">
+            <div class="weapon-header">
+                <h3>{{ weapon.name }}</h3>
+                <span class="weapon-type-badge">{{ weapon.weapon_type }}</span>
+            </div>
+
+            <div class="weapon-details">
+                <div class="detail-row">
+                    <span class="label">💥 伤害:</span>
+                    <span class="value">{{ weapon.damage }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">🔥 射速:</span>
+                    <span class="value">{{ weapon.fire_rate }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">📦 弹匣:</span>
+                    <span class="value">{{ weapon.magazine_size }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">🎯 射程:</span>
+                    <span class="value">{{ weapon.effective_range }}m</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">📊 DPS:</span>
+                    <span class="value strong">{{ "%.1f"|format(weapon.calculate_dps()) }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">🔫 弹药:</span>
+                    <span class="value">{{ weapon.ammo_type }}</span>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('add_weapon', weapon_name=weapon.name) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary btn-block">➕ 添加到背包</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>没有找到武器</h3>
+        <p>试试搜索其他关键词</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

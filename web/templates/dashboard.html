@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}主页 - PUBG武器管理系统{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h2>🎮 欢迎, {{ username }}!</h2>
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🔫</div>
+            <div class="stat-info">
+                <h3>{{ all_weapons|length }}</h3>
+                <p>武器库武器</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🎒</div>
+            <div class="stat-info">
+                <h3>{{ backpack|length }}</h3>
+                <p>背包武器</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-info">
+                <h3>{{ ammo_inventory|length }}</h3>
+                <p>弹药类型</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🤖</div>
+            <div class="stat-info">
+                <h3>AI识别</h3>
+                <p>{{ model_info.split('\\n')[0] if model_info else '未加载' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="section">
+        <h3>⚡ 快速操作</h3>
+        <div class="action-grid">
+            <a href="{{ url_for('weapons') }}" class="action-card">
+                <div class="action-icon">🔍</div>
+                <h4>浏览武器库</h4>
+                <p>查看所有可用武器</p>
+            </a>
+
+            <a href="{{ url_for('backpack') }}" class="action-card">
+                <div class="action-icon">🎒</div>
+                <h4>我的背包</h4>
+                <p>管理你的武器</p>
+            </a>
+
+            <a href="{{ url_for('ammo') }}" class="action-card">
+                <div class="action-icon">📦</div>
+                <h4>弹药管理</h4>
+                <p>管理弹药和换弹</p>
+            </a>
+
+            <a href="{{ url_for('audio_recognition') }}" class="action-card">
+                <div class="action-icon">🎵</div>
+                <h4>音频识别</h4>
+                <p>识别武器声音</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- 我的背包预览 -->
+    {% if backpack %}
+    <div class="section">
+        <h3>🎒 我的背包 ({{ backpack|length }}/10)</h3>
+        <div class="weapon-grid">
+            {% for weapon in backpack[:6] %}
+            <div class="weapon-card">
+                <h4>{{ weapon.name }}</h4>
+                <div class="weapon-stats">
+                    <span>💥 {{ weapon.damage }}</span>
+                    <span>🔥 {{ weapon.fire_rate }}</span>
+                    <span>📊 DPS: {{ "%.1f"|format(weapon.calculate_dps()) }}</span>
+                </div>
+                <span class="weapon-type">{{ weapon.weapon_type }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% if backpack|length > 6 %}
+        <a href="{{ url_for('backpack') }}" class="btn btn-secondary">查看全部 →</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="section">
+        <div class="empty-state">
+            <div class="empty-icon">🎒</div>
+            <h3>背包是空的</h3>
+            <p>去武器库添加一些武器吧!</p>
+            <a href="{{ url_for('weapons') }}" class="btn btn-primary">前往武器库</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
