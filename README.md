@@ -286,7 +286,7 @@ python extract_features.py
 
 ## 开发团队
 
-课程设计项目 - 2025
+I KUN
 
 ## 许可证
 
